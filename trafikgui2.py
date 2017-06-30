@@ -9,7 +9,7 @@ root = Tk()
 labels = list()
 api_trafiklab = ""
 
-#TESTING GIT BRANCH LAYOUT
+#GIT BRANCH LAYOUT
 
 def requestData():
 
@@ -21,8 +21,18 @@ def requestData():
     return departure
 
 def initGUI():
+    frame_empty = Frame(root)
+    frame_empty.grid(row= 0, column=0, padx=10, pady=10)
+    frame_traffic = Frame(root, bg="black")
+    frame_traffic.grid(row= 1, column=0, padx=10, pady=10)
+    frame_traffic.anchor("s")
+    root.columnconfigure(0, weight = 1)
+    root.rowconfigure(0, weight = 3)
+    root.rowconfigure(1, weight = 1)
+
+    
     for l in range(max_items*3):
-        labels.append(Label(root, text="", fg="white", bg="black", font="Helvetica 16 bold"))
+        labels.append(Label(frame_traffic, text="", fg="white", bg="black", font="Helvetica 16 bold"))
 
     root.configure(background="black")
     for i in range(max_items):
