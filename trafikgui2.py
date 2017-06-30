@@ -9,8 +9,7 @@ root = Tk()
 labels = list()
 api_trafiklab = ""
 
-#740000001 centalstation
-#740001178 huddinge sjukhus
+#TESTING GIT BRANCH LAYOUT
 
 def requestData():
 
