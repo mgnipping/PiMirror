@@ -21,16 +21,19 @@ def requestData():
     return departure
 
 def initGUI():
-    frame_empty = Frame(root)
-    frame_empty.grid(row= 0, column=0, padx=10, pady=10)
     frame_traffic = Frame(root, bg="black")
     frame_traffic.grid(row= 1, column=0, padx=10, pady=10)
     frame_traffic.anchor("s")
     root.columnconfigure(0, weight = 1)
     root.rowconfigure(0, weight = 3)
     root.rowconfigure(1, weight = 1)
+    #make window full screen
+    w, h = root.winfo_screenwidth(), root.winfo_screenheight()
+    #suppress status bar, activity bar
+    #root.overrideredirect(1)
+    root.geometry("%dx%d+0+0" % (w, h))
+    root.focus_set()
 
-    
     for l in range(max_items*3):
         labels.append(Label(frame_traffic, text="", fg="white", bg="black", font="Helvetica 16 bold"))
 
