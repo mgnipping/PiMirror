@@ -2,6 +2,7 @@ import time
 import requests
 import json
 import configparser
+import winsound
 from tkinter import *
 
 max_items = 10
@@ -9,11 +10,10 @@ root = Tk()
 labels = list()
 api_trafiklab = ""
 
-#GIT BRANCH LAYOUT
-
 def requestData():
 
-    rstring = "https://api.resrobot.se/v2/departureBoard?key="+ api_trafiklab +"&id=740001178&maxJourneys="+ str(max_items) +"&format=json"
+    #740001178
+    rstring = "https://api.resrobot.se/v2/departureBoard?key="+ api_trafiklab +"&id=740000001&maxJourneys="+ str(max_items) +"&format=json"
     r = requests.get(rstring)
 
     data = r.json()
@@ -34,6 +34,7 @@ def initGUI():
     root.geometry("%dx%d+0+0" % (w, h))
     root.focus_set()
 
+    global labels
     for l in range(max_items*3):
         labels.append(Label(frame_traffic, text="", fg="white", bg="black", font="Helvetica 16 bold"))
 
@@ -45,23 +46,28 @@ def initGUI():
         labels[a+2].grid(row=i, column=2, sticky=W)  
 
 
-def updateGUI(departures):
+def updateGUI():
 
+    departures = requestData()
+    
+    #global labels
+    
     for i in range(max_items):
         a = i*3
-        labels[a].configure(text = departures[i].get("time")[:-3] + "|" )   
-        #labels[a].grid(row=i, column=0)
+        labels[a].configure(text = departures[i].get("time")[:-3] + "|", font="Helvetica 16 bold" )   
 
         labels[a+1].configure(text = departures[i].get("name")[-3:] + "|" )   
-        #labels[a+1].grid(row=i, column=1)
 
-        labels[a+2].configure(text = departures[i].get("direction"))   
-        #labels[a+2].grid(row=i, column=2, sticky=W)
+        labels[a+2].configure(text = departures[i].get("direction"))
+
+    root.after(60000, updateGUI)
 
     
 
 def main():
 
+    #run = True
+    
     #create GUI
     initGUI()
 
@@ -72,9 +78,8 @@ def main():
     api_trafiklab = str(config.get('API-keys','trafiklab1'))
 
     #request API data and update GUI
-    updateGUI(requestData())
+    updateGUI()
     root.mainloop()
-    
 
         
 main()
