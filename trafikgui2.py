@@ -1,8 +1,8 @@
 import time
 import requests
 import json
-import configparser
-import winsound
+import ConfigParser
+#import winsound
 from tkinter import *
 
 max_items = 10
