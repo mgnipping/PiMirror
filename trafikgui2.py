@@ -10,15 +10,20 @@ max_items = 10
 root = Tk()
 labels = list()
 label_clock = None
+t = time.localtime()
 api_trafiklab = ""
 
 def requestData():
-
-<<<<<<< HEAD
+    
     #740001178 #huddinge sjukhus
     #740069445 #stortorp
->>>>>>> 18bca085ee8cc16c382f441baede1097531c7aa4
-    rstring = "https://api.resrobot.se/v2/departureBoard?key="+ api_trafiklab +"&id=740001178&maxJourneys="+ str(max_items) +"&format=json"
+        
+    if t.tm_min != 59:
+        timearg =str(t.tm_hour)+":"+str(t.tm_min+1)
+    else:
+        timearg =str(t.tm_hour+1)+":00"
+        
+    rstring = "https://api.resrobot.se/v2/departureBoard?key="+ api_trafiklab +"&id=740001178&time="+timearg+"&maxJourneys="+ str(max_items) +"&passlist=0&format=json"
     r = requests.get(rstring)
 
     data = r.json()
@@ -73,11 +78,11 @@ def updateGUI():
 
 def updateClock():
     global label_clock
+    global t
     t = time.localtime()
     if t.tm_sec == 1:
         updateGUI()
-        #root.after(60000, updateGUI)
-        
+                
     label_clock.configure(text= time.strftime("%H:%M:%S",t))
     root.after(1000, updateClock)
 
