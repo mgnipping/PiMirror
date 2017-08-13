@@ -8,12 +8,14 @@ from tkinter import *
 max_items = 10
 root = Tk()
 labels = list()
+label_clock = None
 api_trafiklab = ""
 
 def requestData():
 
-    #740001178
-    rstring = "https://api.resrobot.se/v2/departureBoard?key="+ api_trafiklab +"&id=740000001&maxJourneys="+ str(max_items) +"&format=json"
+    #740001178 #huddinge sjukhus
+    #740069445 #stortorp
+    rstring = "https://api.resrobot.se/v2/departureBoard?key="+ api_trafiklab +"&id=740001178&maxJourneys="+ str(max_items) +"&format=json"
     r = requests.get(rstring)
 
     data = r.json()
@@ -21,9 +23,12 @@ def requestData():
     return departure
 
 def initGUI():
+
+    frame_clock = Frame(root, bg="black")
+    frame_clock.grid(row= 0, column=0, padx=10, pady=10)
     frame_traffic = Frame(root, bg="black")
     frame_traffic.grid(row= 1, column=0, padx=10, pady=10)
-    frame_traffic.anchor("s")
+    #frame_traffic.anchor("s")
     root.columnconfigure(0, weight = 1)
     root.rowconfigure(0, weight = 3)
     root.rowconfigure(1, weight = 1)
@@ -38,6 +43,10 @@ def initGUI():
     for l in range(max_items*3):
         labels.append(Label(frame_traffic, text="", fg="white", bg="black", font="Helvetica 16 bold"))
 
+    global label_clock
+    label_clock = Label(frame_clock, text="00:00:00", fg="white", bg="black", font="Helvetica 40 bold")
+    label_clock.grid()
+
     root.configure(background="black")
     for i in range(max_items):
         a = i*3
@@ -50,8 +59,6 @@ def updateGUI():
 
     departures = requestData()
     
-    #global labels
-    
     for i in range(max_items):
         a = i*3
         labels[a].configure(text = departures[i].get("time")[:-3] + "|", font="Helvetica 16 bold" )   
@@ -59,10 +66,17 @@ def updateGUI():
         labels[a+1].configure(text = departures[i].get("name")[-3:] + "|" )   
 
         labels[a+2].configure(text = departures[i].get("direction"))
-
-    root.after(60000, updateGUI)
-
     
+
+def updateClock():
+    global label_clock
+    t = time.localtime()
+    if t.tm_sec == 1:
+        updateGUI()
+        #root.after(60000, updateGUI)
+        
+    label_clock.configure(text= time.strftime("%H:%M:%S",t))
+    root.after(1000, updateClock)
 
 def main():
 
@@ -79,6 +93,7 @@ def main():
 
     #request API data and update GUI
     updateGUI()
+    updateClock()
     root.mainloop()
 
         
