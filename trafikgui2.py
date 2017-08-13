@@ -1,9 +1,10 @@
+#!//usr/local/lib/python3.4
 import time
 import requests
 import json
 import ConfigParser
 #import winsound
-from tkinter import *
+from Tkinter import *
 
 max_items = 10
 root = Tk()
@@ -13,7 +14,7 @@ api_trafiklab = ""
 def requestData():
 
     #740001178
-    rstring = "https://api.resrobot.se/v2/departureBoard?key="+ api_trafiklab +"&id=740000001&maxJourneys="+ str(max_items) +"&format=json"
+    rstring = "https://api.resrobot.se/v2/departureBoard?key="+ api_trafiklab +"&id=740001178&maxJourneys="+ str(max_items) +"&format=json"
     r = requests.get(rstring)
 
     data = r.json()
@@ -23,7 +24,7 @@ def requestData():
 def initGUI():
     frame_traffic = Frame(root, bg="black")
     frame_traffic.grid(row= 1, column=0, padx=10, pady=10)
-    frame_traffic.anchor("s")
+    #frame_traffic.anchor("s")
     root.columnconfigure(0, weight = 1)
     root.rowconfigure(0, weight = 3)
     root.rowconfigure(1, weight = 1)
@@ -72,7 +73,7 @@ def main():
     initGUI()
 
     #get API keys from config file
-    config = configparser.ConfigParser()
+    config = ConfigParser.ConfigParser()
     config.read('cdata.ini')
     global api_trafiklab
     api_trafiklab = str(config.get('API-keys','trafiklab1'))
