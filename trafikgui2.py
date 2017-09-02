@@ -1,10 +1,19 @@
-#!//usr/local/lib/python3.4
+
 import time
 import requests
 import json
-import ConfigParser
-#import winsound
-from Tkinter import *
+import sys
+
+if sys.platform.startswith('linux'):
+    import ConfigParser
+    from Tkinter import *
+    config = ConfigParser.ConfigParser()
+
+else:
+    import configparser
+    from tkinter import *
+    config = configparser.ConfigParser()
+
 
 max_items = 10
 root = Tk()
@@ -17,12 +26,15 @@ def requestData():
     
     #740001178 #huddinge sjukhus
     #740069445 #stortorp
-        
+
+    timearg = ""
+    global t
+    
     if t.tm_min != 59:
-        timearg =str(t.tm_hour)+":"+str(t.tm_min+1)
+        timearg = "{0:0>2}:{1:0>2}".format(t.tm_hour, t.tm_min+1)
     else:
-        timearg =str(t.tm_hour+1)+":00"
-        
+        timearg = "{0:0>2}:00".format((t.tm_hour+1)%24)  
+
     rstring = "https://api.resrobot.se/v2/departureBoard?key="+ api_trafiklab +"&id=740001178&time="+timearg+"&maxJourneys="+ str(max_items) +"&passlist=0&format=json"
     r = requests.get(rstring)
 
@@ -67,20 +79,40 @@ def updateGUI():
 
     departures = requestData()
     
+    global max_items
+    global labels
     for i in range(max_items):
         a = i*3
-        labels[a].configure(text = departures[i].get("time")[:-3] + "|", font="Helvetica 16 bold" )   
 
+        deptime = departures[i].get("time")
+        global t
+        if (int(deptime[0:2]))<t.tm_hour+1 and (int(deptime[3:5])) <= t.tm_min:
+            labels[a].configure(fg = "red")
+            labels[a+1].configure(fg = "red")
+            labels[a+2].configure(fg = "red")
+        else:
+            labels[a].configure(fg = "white")
+            labels[a+1].configure(fg = "white")
+            labels[a+2].configure(fg = "white")
+
+        direction = departures[i].get("direction")
+        indx = direction.find("(")
+        if indx!=-1:
+            direction = direction[:indx]
+        
+        labels[a].configure(text = deptime[:-3] + "|", font="Helvetica 16 bold" )   
+        
         labels[a+1].configure(text = departures[i].get("name")[-3:] + "|" )   
 
-        labels[a+2].configure(text = departures[i].get("direction"))
+        labels[a+2].configure(text = direction)
+        #labels[a+2].configure(text = direction)
     
 
 def updateClock():
     global label_clock
     global t
     t = time.localtime()
-    if t.tm_sec == 1:
+    if t.tm_sec == 0:
         updateGUI()
                 
     label_clock.configure(text= time.strftime("%H:%M:%S",t))
@@ -94,7 +126,6 @@ def main():
     initGUI()
 
     #get API keys from config file
-    config = ConfigParser.ConfigParser()
     config.read('cdata.ini')
     global api_trafiklab
     api_trafiklab = str(config.get('API-keys','trafiklab1'))
